@@ -18,7 +18,7 @@
 				float4 texcoord: TEXCOORD0;	
 			};
 
-			//定义一个结构体 v2f 。命名含义: 固定命名用法, 用于vertex着色器 向 fragment着色器传递的数据结构。
+			//定义一个结构体 v2f 。命名含义:用于vertex着色器 向 fragment着色器传递的数据结构。
 			struct v2f {
 				float4 pos : POSITION;
 				fixed3 color : COLOR0;	//COLOR0 语义可以用于存储颜色信息
