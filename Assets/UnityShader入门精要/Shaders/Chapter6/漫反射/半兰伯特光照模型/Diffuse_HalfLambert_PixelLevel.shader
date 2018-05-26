@@ -1,5 +1,5 @@
-﻿//逐顶点漫反射
-Shader "Unity Shaders Book/Chapter 6/DiffuseVertexLevel"
+﻿//逐像素漫反射 (更加平滑的光照效果)
+Shader "Unity Shaders Book/Chapter 6/Diffuse_HalfLambert_PixelLevel"
 {
 	Properties
 	{	
@@ -30,7 +30,7 @@ Shader "Unity Shaders Book/Chapter 6/DiffuseVertexLevel"
 
 			struct v2f {
 				float4 pos : SV_POSITION;
-				fixed3 color : COLOR;
+				fixed3 worldNormal : TEXCOOD0;
 			};
 
 			v2f vert(a2v v) {
@@ -38,13 +38,17 @@ Shader "Unity Shaders Book/Chapter 6/DiffuseVertexLevel"
 
 				//将顶点坐标从 模型空间 变换到 裁剪空间
 				o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+				//世界空间的法线方向(归一化向量) (公式中的n) 。 (从 模型空间 变换到 世界空间。)
+				o.worldNormal = normalize(mul(unity_ObjectToWorld, v.normal));
+				//o.worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));	//或由世界空间到模型空间的逆矩阵变换
+				return o;
+			}
 
+			fixed4 frag(v2f i) : SV_Target {
 				//环境光 (公式中的 C_ambient)
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;
 
-				//世界空间的法线方向(归一化向量) (公式中的n) 。 (从 模型空间 变换到 世界空间。)
-				fixed3 worldNormal = normalize(mul(unity_ObjectToWorld, v.normal));	//直接由模型空间到世界空间的矩阵进行变换
-				//fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));	//或由世界空间到模型空间的逆矩阵变换
+				fixed3 worldNormal = i.worldNormal;
 
 				//入射光方向(世界空间的直射光) (归一化向量) (公式中的l) 。
 				fixed3 worldLight = normalize(_WorldSpaceLightPos0.xyz);
@@ -55,16 +59,14 @@ Shader "Unity Shaders Book/Chapter 6/DiffuseVertexLevel"
 				//自己控制的漫反射系数
 				fixed3 M_diffuse = _Diffuse.rgb;
 
-				//漫反射计算公式： C_difuse = (C_light * M_diffuse) * max(0, dot(n, l))
-				fixed3 diffuse = (C_light * M_diffuse) * saturate(dot(worldNormal, worldLight));
+				//半兰伯特 漫反射计算公式： C_difuse = (C_light * M_diffuse) * (0.5 * dot(n,l) + 0.5);
+				//半兰伯特没有物理依据,仅仅是一个视觉加强的技术
+				fixed3 diffuse = (C_light * M_diffuse) * (0.5 * dot(worldNormal, worldLight) + 0.5);
 
 				//最后加上环境光
-				o.color = ambient + diffuse;
-				return o;
-			}
+				fixed3 color = ambient + diffuse;
 
-			fixed4 frag(v2f i) : SV_Target {
-				return fixed4(i.color, 1.0);
+				return fixed4(color, 1.0);
 			}
 
 			ENDCG

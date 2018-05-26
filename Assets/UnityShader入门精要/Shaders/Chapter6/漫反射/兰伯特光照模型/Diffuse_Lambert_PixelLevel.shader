@@ -1,5 +1,5 @@
 ﻿//逐像素漫反射 (更加平滑的光照效果)
-Shader "Unity Shaders Book/Chapter 6/DiffusePixelLevel_HalfLambert"
+Shader "Unity Shaders Book/Chapter 6/Diffuse_Lambert_PixelLevel"
 {
 	Properties
 	{	
@@ -51,7 +51,7 @@ Shader "Unity Shaders Book/Chapter 6/DiffusePixelLevel_HalfLambert"
 				fixed3 worldNormal = i.worldNormal;
 
 				//入射光方向(世界空间的直射光) (归一化向量) (公式中的l) 。
-				fixed3 worldLight = normalize(_WorldSpaceLightPos0.xyz);
+				fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
 
 				//光源信息。 _LightColor0是Unity内置变量, 表示访问该Pass处理的光源的颜色和强度信息(注意要定义合适的LightMode标签)
 				fixed3 C_light = _LightColor0.rgb;
@@ -59,9 +59,8 @@ Shader "Unity Shaders Book/Chapter 6/DiffusePixelLevel_HalfLambert"
 				//自己控制的漫反射系数
 				fixed3 M_diffuse = _Diffuse.rgb;
 
-				//半兰伯特 漫反射计算公式： C_difuse = (C_light * M_diffuse) * (0.5 * dot(n,l) + 0.5);
-				//半兰伯特没有物理依据,仅仅是一个视觉加强的技术
-				fixed3 diffuse = (C_light * M_diffuse) * (0.5 * dot(worldNormal, worldLight) + 0.5);
+				//漫反射计算公式： C_difuse = (C_light * M_diffuse) * max(0, dot(n, l))
+				fixed3 diffuse = (C_light * M_diffuse) * saturate(dot(worldNormal, worldLightDir));
 
 				//最后加上环境光
 				fixed3 color = ambient + diffuse;
