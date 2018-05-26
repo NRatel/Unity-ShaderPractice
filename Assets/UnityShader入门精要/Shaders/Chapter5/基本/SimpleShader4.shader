@@ -1,4 +1,5 @@
-﻿Shader "Unity Shaders Book/Chapter 5/SimpleShader4"
+﻿//自定义属性参数，控制Shader表现
+Shader "Unity Shaders Book/Chapter 5/SimpleShader4"
 {
 	Properties
 	{	

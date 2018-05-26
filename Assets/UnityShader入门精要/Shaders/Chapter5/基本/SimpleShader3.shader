@@ -1,4 +1,5 @@
-﻿Shader "Unity Shaders Book/Chapter 5/SimpleShader3"
+﻿//认识结构体 v2f - vertex着色器 向 fragment着色器传递
+Shader "Unity Shaders Book/Chapter 5/SimpleShader3"
 {
 	Properties
 	{	

@@ -1,5 +1,4 @@
-﻿// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
-
+﻿//逐顶点漫反射
 Shader "Unity Shaders Book/Chapter 6/DiffuseVertexLevel"
 {
 	Properties

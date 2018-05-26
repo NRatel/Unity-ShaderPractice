@@ -1,4 +1,5 @@
-﻿Shader "Unity Shaders Book/Chapter 5/SimpleShader2"
+﻿//认识结构体 a2f - application 向 vertex着色器传递
+Shader "Unity Shaders Book/Chapter 5/SimpleShader2"
 {
 	Properties
 	{	

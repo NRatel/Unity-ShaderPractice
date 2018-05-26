@@ -1,4 +1,5 @@
-﻿Shader "Unity Shaders Book/Chapter 5/SimpleShader"
+﻿//认识基本声明和方法
+Shader "Unity Shaders Book/Chapter 5/SimpleShader1"
 {
 	Properties
 	{	
