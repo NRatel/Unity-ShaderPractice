@@ -1,4 +1,5 @@
 ﻿//BlinnPong模型 逐像素高光反射 使用Unity内置方法
+//这些内置方法 参考 《Unity Shader入门精要》第137页的表格
 Shader "Unity Shaders Book/Chapter 6/Specular_BlinnPong_PixelLevel_UseBuildFunction"
 {
 	Properties
