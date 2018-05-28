@@ -1,4 +1,6 @@
-﻿Shader "Unity Shaders Book/Chapter 6/Specular_BlinnPong_PixelLevel"
+﻿//BlinnPong模型 逐像素高光反射
+
+Shader "Unity Shaders Book/Chapter 6/Specular_BlinnPong_PixelLevel"
 {
 	Properties
 	{	

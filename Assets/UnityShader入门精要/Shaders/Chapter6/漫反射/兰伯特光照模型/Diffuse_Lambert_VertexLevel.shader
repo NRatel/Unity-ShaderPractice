@@ -1,4 +1,4 @@
-﻿//逐顶点漫反射
+﻿//兰伯特光照模型 逐顶点漫反射
 Shader "Unity Shaders Book/Chapter 6/Diffuse_Lambert_VertexLevel"
 {
 	Properties

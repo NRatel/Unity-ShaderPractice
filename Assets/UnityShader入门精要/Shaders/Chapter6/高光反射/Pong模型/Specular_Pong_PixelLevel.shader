@@ -1,4 +1,5 @@
-﻿Shader "Unity Shaders Book/Chapter 6/Specular_Pong_PixelLevel"
+﻿//Pong模型 逐像素高光反射
+Shader "Unity Shaders Book/Chapter 6/Specular_Pong_PixelLevel"
 {
 	Properties
 	{	

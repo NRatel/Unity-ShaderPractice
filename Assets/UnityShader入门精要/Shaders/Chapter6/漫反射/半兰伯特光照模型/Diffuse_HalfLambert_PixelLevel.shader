@@ -1,4 +1,4 @@
-﻿//逐像素漫反射 (更加平滑的光照效果)
+﻿//半兰伯特光照模型 逐像素漫反射 (更加平滑的光照效果)
 Shader "Unity Shaders Book/Chapter 6/Diffuse_HalfLambert_PixelLevel"
 {
 	Properties

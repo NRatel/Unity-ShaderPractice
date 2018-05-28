@@ -1,4 +1,5 @@
-﻿Shader "Unity Shaders Book/Chapter 6/Specular_Pong_VertexLevel"
+﻿//BlinnPong模型 逐顶点高光反射
+Shader "Unity Shaders Book/Chapter 6/Specular_Pong_VertexLevel"
 {
 	Properties
 	{	

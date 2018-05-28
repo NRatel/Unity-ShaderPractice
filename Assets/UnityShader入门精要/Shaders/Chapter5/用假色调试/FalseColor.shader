@@ -1,5 +1,5 @@
 ﻿//调试Shader,观察法线、切线、副切线、第一二组纹理坐标等。
-Shader "Unity Shaders Book/Chapter 5/SimpleShader5"
+Shader "Unity Shaders Book/Chapter 5/FalseColor"
 {
 	Properties
 	{	
