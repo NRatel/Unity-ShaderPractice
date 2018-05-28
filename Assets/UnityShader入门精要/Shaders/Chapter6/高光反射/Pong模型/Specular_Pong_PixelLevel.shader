@@ -1,4 +1,4 @@
-﻿Shader "Unity Shaders Book/Chapter 6/Specular_Pong_VertexLevel"
+﻿Shader "Unity Shaders Book/Chapter 6/Specular_Pong_PixelLevel"
 {
 	Properties
 	{	
@@ -31,7 +31,8 @@
 
 			struct v2f {
 				float4 pos : SV_POSITION;
-				fixed3 color : COLOR;
+				float3 worldNormal : TEXCOORD0;
+				float3 worldPos : TEXCOORD1;
 			};
 
 			v2f vert(a2v v) {
@@ -39,12 +40,20 @@
 				//将顶点坐标从 模型空间 变换到 裁剪空间
 				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 
+				//世界空间的法线方向(归一化向量) (公式中的n) 。 (从 模型空间 变换到 世界空间。)
+				o.worldNormal = normalize(mul(unity_ObjectToWorld, v.normal));	//直接由模型空间到世界空间的矩阵进行变换
+				//o.worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));	//或由世界空间到模型空间的逆矩阵变换
+
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+
+				return o;
+			}
+
+			fixed4 frag(v2f i) : SV_Target {
 				//环境光 (公式中的 C_ambient)
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;
 
-				//世界空间的法线方向(归一化向量) (公式中的n) 。 (从 模型空间 变换到 世界空间。)
-				fixed3 worldNormal = normalize(mul(unity_ObjectToWorld, v.normal));	//直接由模型空间到世界空间的矩阵进行变换
-				//fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));	//或由世界空间到模型空间的逆矩阵变换
+				fixed3 worldNormal = i.worldNormal;
 
 				//入射光方向(世界空间的直射光) (归一化向量) (公式中的l) 。
 				fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
@@ -59,8 +68,9 @@
 				fixed3 diffuse = (C_light * M_diffuse) * saturate(dot(worldNormal, worldLightDir));
 
 				//--------------------------------计算高光部分--------------------------------
+
 				//视角方向
-				fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, v.vertex).xyz);
+				fixed3 viewDir = normalize(_WorldSpaceCameraPos.xyz - i.worldPos.xyz);
 
 				//反射光方向, 
 				//计算公式：r = l - 2 * dot(n, l) * n。l为入射方向，n为法线方向 
@@ -77,13 +87,9 @@
 				fixed3 specular = (C_light * M_specular) * pow(saturate(dot(viewDir, reflectDir)), M_gloss);	//注意原书写的不一致，是因为向量点乘满足交换律。
 
 				//结合环境光、漫反射和高光反射
-				o.color = ambient + diffuse + specular;
+				fixed3 color = ambient + diffuse + specular;
 
-				return o;
-			}
-
-			fixed4 frag(v2f i) : SV_Target {
-				return fixed4(i.color, 1.0);
+				return fixed4(color, 1.0);
 			}
 
 
