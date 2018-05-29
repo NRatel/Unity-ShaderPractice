@@ -1,5 +1,7 @@
-﻿//凹凸映射_切线空间下的法线纹理
-Shader "Unity Shaders Book/Chapter 7/NormalMapInTangentSpace"
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+//凹凸映射_世界空间下的法线纹理
+Shader "Unity Shaders Book/Chapter 7/NormalMapInWorldSpace"
 {
 	Properties
 	{	
@@ -43,8 +45,12 @@ Shader "Unity Shaders Book/Chapter 7/NormalMapInTangentSpace"
 			struct v2f {
 				float4 pos : SV_POSITION;
 				float4 uv : TEXCOORD0;
-				float3 lightDir : TEXCOORD1;
-				float3 viewDir : TEXCOORD2;
+
+				//因为不能传递矩阵，所以将矩阵分为多行进行传递。float3x3
+				//但是，为了充分利用插值寄存器的存储空间，将世界空间下的顶点位置存储在这些变量的w分量中, 所以定义为float4
+				float4 tangentToWorld0 : TEXCOORD1;	//tangentToWorld变换矩阵的第一行
+				float4 tangentToWorld1 : TEXCOORD2; //tangentToWorld变换矩阵的第二行
+				float4 tangentToWorld2 : TEXCOORD3; //tangentToWorld变换矩阵的第三行
 			};
 
 			v2f vert(a2v v) {
@@ -56,21 +62,22 @@ Shader "Unity Shaders Book/Chapter 7/NormalMapInTangentSpace"
 				//zw存放_BumpMap的纹理坐标
 				o.uv.zw = v.texcoord.xy * _BumpMap_ST.xy + _BumpMap_ST.zw;
 				
-				//副法线, 由法线和切线的叉积，乘以 切线的w分量。w决定了正反方向
-				//float3 binormal = cross(normalize(v.normal), normalize(v.tangent.xyz)) * v.tangent.w;
-				//rotation 为模型空间到切线空间的变换矩阵
-				//float3x3 rotation = float3x3(v.tangent.xyz, binormal, v.normal);
+				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+				fixed3 worldNormal = UnityObjectToWorldNormal(v.normal);
+				fixed3 worldTangent = UnityObjectToWorldDir(v.tangent.xyz);
+				fixed3 worldBinormal = cross(worldNormal, worldTangent) * v.tangent.w;	//由法线和切线算出副法线
 
-				TANGENT_SPACE_ROTATION;	//此内置宏定义 在UnityCG.cginc中。其中定义了上面的binormal和rotation
+				o.tangentToWorld0 = float4(worldTangent.x, worldBinormal.x, worldNormal.x, worldPos.x);
+				o.tangentToWorld1 = float4(worldTangent.y, worldBinormal.y, worldNormal.y, worldPos.y);
+				o.tangentToWorld2 = float4(worldTangent.z, worldBinormal.z, worldNormal.z, worldPos.z);
 
-				o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;
-				o.viewDir = mul(rotation, ObjSpaceViewDir(v.vertex)).xyz;
 				return o;
 			}
 
 			fixed4 frag(v2f i): SV_Target {
-				fixed3 tangentLightDir = normalize(i.lightDir);
-				fixed3 tangentViewDir = normalize(i.viewDir);
+				float3 worldPos = float3(i.tangentToWorld0.w, i.tangentToWorld1.w, i.tangentToWorld2.w);
+				fixed3 lightDir = normalize(UnityWorldSpaceLightDir(worldPos));
+				fixed3 viewDir = normalize(UnityWorldSpaceViewDir(worldPos));
 
 				fixed4 packedNormal = tex2D(_BumpMap, i.uv.zw);	//利用tex2D对法线纹理_BumpMap进行采样。
 
@@ -79,22 +86,24 @@ Shader "Unity Shaders Book/Chapter 7/NormalMapInTangentSpace"
 				tangentNormal.xy *= _BumpScale;							//xy分量乘以凹凸程度进行缩放, 得到最终的xy分量
 				tangentNormal.z = sqrt(1.0 - saturate(dot(tangentNormal.xy, tangentNormal.xy)));	//因为法线是单位矢量,所以z分量可以由xy分量计算出来
 
-				fixed3 C_light = _LightColor0.rgb;
+				//将法线从切线空间变换到世界空间
+				fixed3 bump = normalize(half3(dot(i.tangentToWorld0.xyz, tangentNormal), dot(i.tangentToWorld1.xyz, tangentNormal), dot(i.tangentToWorld2.xyz, tangentNormal)));
 
+				fixed3 C_light = _LightColor0.rgb;
 				fixed3 albedo = tex2D(_MainTex, i.uv).rgb * _Color.rgb;	
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb * albedo;
 
 				//通常，使用纹理来代替物体的漫反射颜色。
 				//漫反射计算公式： C_difuse = (C_light * M_diffuse) * max(0, dot(n, l))
-				fixed3 diffuse = (C_light * albedo) * saturate(dot(tangentNormal, tangentLightDir));
+				fixed3 diffuse = (C_light * albedo) * saturate(dot(bump, lightDir));
 
-				fixed3 halfDir = normalize(tangentViewDir + tangentLightDir);
+				fixed3 halfDir = normalize(viewDir + lightDir);
 				fixed3 M_specular = _Specular.rgb;
 				float M_gloss = _Gloss;
 
 				//高光反射计算公式： (C_light * M_specular) * pow(saturate(dot(n, h)), M_gloss);
-				fixed3 specular = (C_light * M_specular) * pow(saturate(dot(tangentNormal, halfDir)), M_gloss);	//注意原书写的不一致，是因为向量点乘满足交换律。
-
+				fixed3 specular = (C_light * M_specular) * pow(saturate(dot(bump, halfDir)), M_gloss);	//注意原书写的不一致，是因为向量点乘满足交换律。
+				
 				return fixed4(ambient + diffuse + specular, 1.0);
 			}
 
