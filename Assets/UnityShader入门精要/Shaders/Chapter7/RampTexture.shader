@@ -1,11 +1,13 @@
 ﻿//渐变纹理
-Shader "Unity Shaders Book/Chapter 6/RampTexture"
+Shader "Unity Shaders Book/Chapter 7/RampTexture"
 {
 	Properties
 	{	
-		_Diffuse ("Diffuse", Color) = (1, 1, 1, 1)		//漫反射系数 ，控制漫反射的颜色
+		_Color ("Color Tint", Color) = (1, 1, 1, 1)		//漫反射系数 ，控制漫反射的颜色
 		_Specular ("Specular", Color) = (1, 1, 1, 1)	//高光反射系数 ，控制高光反射的颜色	
 		_Gloss ("Gloss", Range(8.0, 256)) = 20			//高光反射光泽度(反光度)，控制高光区域的大小
+
+		_RampTex ("Ramp Tex", 2D) = "white" {}			//纹理, 默认为名为"white"的内置的全白纹理
 	}
 
 	SubShader
@@ -13,86 +15,72 @@ Shader "Unity Shaders Book/Chapter 6/RampTexture"
 		Pass
 		{
 			Tags { "LightMode" = "ForwardBase" }
-			
+
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-
-			//引入光照相关的内置变量
 			#include "Lighting.cginc"
 
-			fixed4 _Diffuse;
+			fixed4 _Color;
 			fixed4 _Specular;
 			float _Gloss;
+			sampler2D _RampTex;
+			//注意：_RampTex_ST 名字不是随便起的，
+			//在Unity中，_ST是缩放(Scale)和平移(Translation)的缩写,可以得到该纹理的缩放和平移(偏移)值，
+			//_RampTex_ST.xy存放的是缩放值,而_RampTex_ST.zw存储的是偏移值,这些值可以在材质面板的纹理属性中调节。
+			float4 _RampTex_ST;	 
 
 			struct a2v {
 				float4 vertex : POSITION;
 				float3 normal : NORMAL;
+				float4 texcoord : TEXCOORD0;
 			};
 
 			struct v2f {
 				float4 pos : SV_POSITION;
 				float3 worldNormal : TEXCOORD0;
 				float3 worldPos : TEXCOORD1;
+				float2 uv : TEXCOORD2;
 			};
 
 			v2f vert(a2v v) {
 				v2f o;
-				//将顶点坐标从 模型空间 变换到 裁剪空间
 				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
-
-				//使用Unity内置方法 UnityObjectToWorldNormal 计算法线
 				o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));
-
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
-
+				o.uv = TRANSFORM_TEX(v.texcoord, _RampTex);					//Unity内置方法计算uv
+				//o.uv = v.texcoord.xy + _RampTex_ST.xy + _RampTex_ST.zw;	//自己计算uv
 				return o;
 			}
 
-			fixed4 frag(v2f i) : SV_Target {
-				//环境光 (公式中的 C_ambient)
-				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;
-
+			fixed4 frag(v2f i): SV_Target {
 				fixed3 worldNormal = i.worldNormal;
-
-				//使用Unity内置方法 UnityWorldSpaceLightDir 计算入射光方向(直射光和非直射光都适用)
 				fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));
-
-				//光源信息。 _LightColor0是Unity内置变量, 表示访问该Pass处理的光源的颜色和强度信息(注意要定义合适的LightMode标签)
 				fixed3 C_light = _LightColor0.rgb;
 
-				//自己控制的漫反射系数
-				fixed3 M_diffuse = _Diffuse.rgb;
+				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;
+				fixed halfLambert = 0.5 * dot(worldNormal, worldLightDir) + 0.5;
+				fixed3 diffuseColor = tex2D(_RampTex, fixed2(halfLambert, halfLambert)).rgb * _Color.rgb;	
+				fixed3 diffuse = C_light * diffuseColor;
 
-				//漫反射计算公式： C_difuse = (C_light * M_diffuse) * max(0, dot(n, l))
-				fixed3 diffuse = (C_light * M_diffuse) * saturate(dot(worldNormal, worldLightDir));
+				//fixed3 albedo = tex2D(_RampTex, i.uv).rgb * _Color.rgb;	
+				//fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb * albedo;
+				//fixed3 diffuse = (C_light * albedo) * (0.5 * dot(worldNormal, worldLightDir) + 0.5);
 
-				//--------------------------------计算高光部分--------------------------------
-
-				//使用Unity内置方法 UnityWorldSpaceViewDir 计算视角方向
 				fixed3 viewDir = normalize(UnityWorldSpaceViewDir(i.worldPos));
-
-				//half方向,(由视角方向和入射光方向相加再归一化获得)。
-				//公式：h = normalize(v + l)
 				fixed3 halfDir = normalize(viewDir + worldLightDir);
-
-				//自己控制的高光反射系数
 				fixed3 M_specular = _Specular.rgb;
-
-				//自己控制的高光反射光泽度
 				float M_gloss = _Gloss;
 
 				//高光反射计算公式： (C_light * M_specular) * pow(saturate(dot(n, h)), M_gloss);
 				fixed3 specular = (C_light * M_specular) * pow(saturate(dot(worldNormal, halfDir)), M_gloss);	//注意原书写的不一致，是因为向量点乘满足交换律。
 
-				//结合环境光、漫反射和高光反射
-				fixed3 color = ambient + diffuse + specular;
-
-				return fixed4(color, 1.0);
+				return fixed4(ambient + diffuse + specular, 1.0);
 			}
-
 
 			ENDCG
 		}
 	}
+
+	Fallback "Specular"
 }
