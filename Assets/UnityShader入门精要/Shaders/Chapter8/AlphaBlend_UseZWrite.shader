@@ -1,24 +1,33 @@
-﻿//透明度测试
-Shader "NRatelShader/AlphaTest"
+﻿//透明度混合
+Shader "NRatelShader/AlphaBlend_UseZWrite"
 {
 	Properties
 	{	
 		_Color("Main Tint", Color) = (1, 1, 1, 1)
 		_MainTex("Main Tex", 2D) = "white" {}
-		_Cutoff("Alpha Cutoff", Range(0, 1)) = 0.5		//用于调用clip进行透明度测试时使用的判断条件。它的范围是(0, 1),是因为纹理像素的透明度范围就在此范围内
+		_AlphaScale ("AlphaScale", Range(0, 1)) = 1		//控制整体透明度
 	}
 
 	SubShader
 	{	
 		//SubShader的标签设置，详见32页表格。
-		//"Queue" = "AlphaTest" : 设为AlphaTest队列。需要透明度测试的物体使用这个队列(Unity5以上)
+		//"Queue" = "Transparent" : 设为Transparent渲染队列。使用了透明度混合的物体需要使用这个队列
 		//"IgnoreProjector" = "true" : true表示 这个Shader不会受投影器(Projector)的影响。
-		//"RenderType" = "TransparentCutout": RenderType标签常被用于着色器替换功能。RenderType标签把这个Shader归入到提前定义的组(TransparentCutout:蒙皮透明着色器)中。
-		//通常，使用透明测试的Shader都应该在SubShader中设置这三个标签。
-		Tags {"Queue" = "AlphaTest" "IgnoreProjector" = "true" "RenderType" = "TransparentCutout"}
-		Pass
-		{
+		//"RenderType" = "Transparent": RenderType标签常被用于着色器替换功能。RenderType标签把这个Shader归入到提前定义的组(Transparent:半透明着色器)中。
+		Tags {"Queue" = "Transparent" "IgnoreProjector" = "true" "RenderType" = "Transparent"}
+		
+		//这个Pass只负责写入深度缓存
+		Pass {
+			ZWrite On
+			ColorMask 0		//该Shader不写入任何颜色通道，即不输出任何颜色
+		}
+		
+		Pass {
 			Tags {"LightMode" = "ForwardBase" }
+				
+			//状态设置指令, 详见31页表格。
+			ZWrite Off								//关闭该Pass的深度写入
+			Blend SrcAlpha OneMinusSrcAlpha			//开启并设置Pass的混合模式
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -29,7 +38,7 @@ Shader "NRatelShader/AlphaTest"
 			fixed4 _Color;
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-			fixed _Cutoff;
+			fixed _AlphaScale;
 
 			struct a2v{
 				float3 vertex : POSITION;
@@ -58,10 +67,6 @@ Shader "NRatelShader/AlphaTest"
 				fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));
 				fixed4 texColor = tex2D(_MainTex, i.uv);
 
-				// clip() 将舍弃给定参数为负的像素的输出颜色
-				// 即 _MainTex上透明通道a 小于 _Cutoff的像素将被舍弃
-				clip(texColor.a - _Cutoff);	// 相当于 if((texColor.a-_Cutoff) < 0.0){ discard; }
-
 				fixed3 albedo = texColor.rgb * _Color.rgb;
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 				
@@ -71,12 +76,13 @@ Shader "NRatelShader/AlphaTest"
 				//漫反射计算公式： C_difuse = (C_light * M_diffuse) * max(0, dot(n, l))
 				fixed3 diffuse = (C_light * albedo) * max(0, dot(worldNormal, worldLightDir));
 
-				return fixed4(ambient + diffuse, 1.0);
+				//这里只需使用贴图对应像素真实透明度和透明度缩放的乘积。
+				return fixed4(ambient + diffuse, texColor.a * _AlphaScale);
 			}
 
 			ENDCG
 		}
 	}
 
-	Fallback "Tranparent/Cutoff/VertexLit"
+	FallBack "Transparent/VertexLit"
 }
