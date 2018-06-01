@@ -27,7 +27,7 @@ Shader "NRatelShader/AlphaBlend_UseZWrite"
 				
 			//状态设置指令, 详见31页表格。
 			ZWrite Off								//关闭该Pass的深度写入
-			Blend SrcAlpha OneMinusSrcAlpha			//开启并设置Pass的混合模式
+			Blend SrcAlpha OneMinusSrcAlpha			//开启并设置Pass的混合模式。 O_rbg = SrcAlpha * S_rgb + OneMinusSrcAlpha + D_rgb
 
 			CGPROGRAM
 			#pragma vertex vert
