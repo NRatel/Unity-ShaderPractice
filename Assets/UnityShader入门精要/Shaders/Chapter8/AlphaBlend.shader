@@ -1,5 +1,5 @@
 ﻿//透明度混合
-Shader "NRatelShader/AlphaBlend"
+Shader "Unity Shaders Book/Chapter 8/AlphaBlend"
 {
 	Properties
 	{	

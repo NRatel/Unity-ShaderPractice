@@ -1,5 +1,5 @@
 ﻿//透明度测试
-Shader "NRatelShader/AlphaTest"
+Shader "Unity Shaders Book/Chapter 8/AlphaTest"
 {
 	Properties
 	{	

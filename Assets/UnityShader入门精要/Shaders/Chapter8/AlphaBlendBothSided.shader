@@ -1,5 +1,5 @@
 ﻿//透明度混合
-Shader "Unity Shaders Book/Chapter 8/AlphaBlend_UseZWrite"
+Shader "Unity Shaders Book/Chapter 8/AlphaBlendBothSided"
 {
 	Properties
 	{	
@@ -15,16 +15,75 @@ Shader "Unity Shaders Book/Chapter 8/AlphaBlend_UseZWrite"
 		//"IgnoreProjector" = "true" : true表示 这个Shader不会受投影器(Projector)的影响。
 		//"RenderType" = "Transparent": RenderType标签常被用于着色器替换功能。RenderType标签把这个Shader归入到提前定义的组(Transparent:半透明着色器)中。
 		Tags {"Queue" = "Transparent" "IgnoreProjector" = "true" "RenderType" = "Transparent"}
-		
-		//这个Pass只负责写入深度缓存
-		Pass {
-			ZWrite On
-			ColorMask 0		//该Shader不写入任何颜色通道，即不输出任何颜色
-		}
-		
-		Pass {
+		Pass
+		{
 			Tags {"LightMode" = "ForwardBase" }
+
+			Cull Front		//第一个Pass中剔除正面, 先渲染背面
+
+			//状态设置指令, 详见31页表格。
+			ZWrite Off								//关闭该Pass的深度写入
+			Blend SrcAlpha OneMinusSrcAlpha			//开启并设置Pass的混合模式。 O_rbg = SrcAlpha * S_rgb + OneMinusSrcAlpha + D_rgb
+
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#include "UnityCG.cginc"
+			#include "Lighting.cginc"
+
+			fixed4 _Color;
+			sampler2D _MainTex;
+			float4 _MainTex_ST;
+			fixed _AlphaScale;
+
+			struct a2v{
+				float3 vertex : POSITION;
+				float3 normal : NORMAL;
+				float4 texcood : TEXCOORD0;
+			};
+
+			struct v2f{
+				float4 pos : SV_POSITION;
+				float3 worldNormal : TEXCOORD0;
+				float3 worldPos : TEXCOORD1;
+				float2 uv : TEXCOORD2;
+			};
+
+			v2f vert(a2v v){
+				v2f o;
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.worldNormal = UnityObjectToWorldNormal(v.normal);
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+				o.uv = TRANSFORM_TEX(v.texcood, _MainTex);
+				return o;
+			}
+
+			fixed4 frag(v2f i) : SV_Target{
+				fixed3 worldNormal = normalize(i.worldNormal);
+				fixed3 worldLightDir = normalize(UnityWorldSpaceLightDir(i.worldPos));
+				fixed4 texColor = tex2D(_MainTex, i.uv);
+
+				fixed3 albedo = texColor.rgb * _Color.rgb;
+				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 				
+				fixed3 C_light = _LightColor0.rgb;
+
+				//通常，使用纹理来代替物体的漫反射颜色。
+				//漫反射计算公式： C_difuse = (C_light * M_diffuse) * max(0, dot(n, l))
+				fixed3 diffuse = (C_light * albedo) * max(0, dot(worldNormal, worldLightDir));
+
+				//这里只需使用贴图对应像素真实透明度和透明度缩放的乘积。
+				return fixed4(ambient + diffuse, texColor.a * _AlphaScale);
+			}
+
+			ENDCG
+		}
+		Pass
+		{
+			Tags {"LightMode" = "ForwardBase" }
+			
+			Cull Back	//第二个Pass中剔除背面，后渲染正面
+
 			//状态设置指令, 详见31页表格。
 			ZWrite Off								//关闭该Pass的深度写入
 			Blend SrcAlpha OneMinusSrcAlpha			//开启并设置Pass的混合模式。 O_rbg = SrcAlpha * S_rgb + OneMinusSrcAlpha + D_rgb
@@ -84,5 +143,5 @@ Shader "Unity Shaders Book/Chapter 8/AlphaBlend_UseZWrite"
 		}
 	}
 
-	FallBack "Transparent/VertexLit"
+	Fallback "Tranparent/Cutoff/VertexLit"
 }
