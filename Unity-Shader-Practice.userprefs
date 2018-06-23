@@ -1,8 +1,8 @@
 ﻿<Properties StartupItem="Unity-Shader-Practice.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\UnityShader入门精要\Shaders\Chapter9\Chapter9-Shadow.shader">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\UnityShader入门精要\Shaders\Chapter10\Reflection.shader">
     <Files>
-      <File FileName="Assets\UnityShader入门精要\Shaders\Chapter9\Chapter9-Shadow.shader" Line="1" Column="1" />
+      <File FileName="Assets\UnityShader入门精要\Shaders\Chapter10\Reflection.shader" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
