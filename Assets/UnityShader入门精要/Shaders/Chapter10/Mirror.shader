@@ -28,7 +28,7 @@
 				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 				
 				o.uv = v.texcoord;
-				// Mirror needs to filp x
+				// 镜面效果, 相机在照射那侧，结果要水平翻转。
 				o.uv.x = 1 - o.uv.x;
 				
 				return o;
