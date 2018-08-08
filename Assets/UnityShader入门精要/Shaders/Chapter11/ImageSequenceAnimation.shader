@@ -46,7 +46,7 @@
 				v2f o;  
 				//顶点变换-模型空间到裁剪空间
 				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);  
-				//Unity内置方法计算uv
+				//使用Unity内置的TRANSFORM_TEX方法计算uv
 				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);  
 				return o;
 			}  
