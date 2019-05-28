@@ -1,4 +1,4 @@
-﻿Shader "Unity Shaders Book/Chapter 11/Scrolling Background" {
+﻿Shader "Unity Shaders Book/Chapter 11/Scrolling Background2" {
 	Properties {
 		_MainTex ("Base Layer (RGB)", 2D) = "white" {}			//第一层纹理(下层)
 		_DetailTex ("2nd Layer (RGB)", 2D) = "white" {}			//第二层纹理(上层)
@@ -16,8 +16,8 @@
 			
 			#pragma vertex vert
 			#pragma fragment frag
-			//#pragma fragmentoption ARB_precision_hint_nicest 
-			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma fragmentoption ARB_precision_hint_nicest 
+			//#pragma fragmentoption ARB_precision_hint_fastest
 			
 			#include "UnityCG.cginc"
 			
