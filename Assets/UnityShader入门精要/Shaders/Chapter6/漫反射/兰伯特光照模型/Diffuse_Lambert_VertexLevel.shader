@@ -1,4 +1,6 @@
-﻿//兰伯特光照模型 逐顶点漫反射
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//兰伯特光照模型 逐顶点漫反射
 Shader "Unity Shaders Book/Chapter 6/Diffuse_Lambert_VertexLevel"
 {
 	Properties
@@ -37,7 +39,7 @@ Shader "Unity Shaders Book/Chapter 6/Diffuse_Lambert_VertexLevel"
 				v2f o;
 
 				//将顶点坐标从 模型空间 变换到 裁剪空间
-				o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos (v.vertex);
 
 				//环境光 (公式中的 C_ambient)
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;

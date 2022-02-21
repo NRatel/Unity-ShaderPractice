@@ -1,4 +1,6 @@
-﻿//认识基本声明和方法
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//认识基本声明和方法
 Shader "Unity Shaders Book/Chapter 5/SimpleShader1"
 {
 	Properties
@@ -21,7 +23,7 @@ Shader "Unity Shaders Book/Chapter 5/SimpleShader1"
 			//输出(返回值)是 该顶点在裁剪空间中的位置, 这是通过 SV_POSITION 指定的。。
 			//POSITION 和 SV_POSITION 都是Cg/HLSL的语义, 它们是不可省略的。 这些语义告诉系统用户需要哪些输入值，以及用户输出的是什么。
 			float4 vert(float4 v : POSITION) : SV_POSITION {
-				return mul (UNITY_MATRIX_MVP, v);
+				return UnityObjectToClipPos (v);
 			} 
 
 			//逐片元执行

@@ -1,4 +1,6 @@
-﻿//认识结构体 v2f - vertex着色器 向 fragment着色器传递
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//认识结构体 v2f - vertex着色器 向 fragment着色器传递
 Shader "Unity Shaders Book/Chapter 5/SimpleShader3"
 {
 	Properties
@@ -27,7 +29,7 @@ Shader "Unity Shaders Book/Chapter 5/SimpleShader3"
 
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.color = v.normal * 0.5 + fixed3(0.5, 0.5, 0.5); //将法线分量的范围映射到了[0.0, 1.0]。
 				return o;
 			}

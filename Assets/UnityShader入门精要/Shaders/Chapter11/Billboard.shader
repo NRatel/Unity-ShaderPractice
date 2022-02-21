@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
 //广告牌： 始终面向摄像机
 Shader "Unity Shaders Book/Chapter 11/Billboard" {
@@ -80,7 +82,7 @@ Shader "Unity Shaders Book/Chapter 11/Billboard" {
 				float3 localPos = center + rightDir * centerOffs.x + upDir * centerOffs.y + normalDir * centerOffs.z;
 				
 				//把模型空间的顶点位置变换到裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, float4(localPos, 1));
+				o.pos = UnityObjectToClipPos(float4(localPos, 1));
 				//计算uv
 				o.uv = TRANSFORM_TEX(v.texcoord,_MainTex);
 

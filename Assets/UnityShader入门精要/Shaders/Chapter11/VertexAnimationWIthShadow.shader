@@ -1,4 +1,6 @@
-﻿Shader "Unity Shaders Book/Chapter 11/Vertex Animation With Shadow" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Unity Shaders Book/Chapter 11/Vertex Animation With Shadow" {
 	Properties {
 		_MainTex ("Main Tex", 2D) = "white" {}
 		_Color ("Color Tint", Color) = (1, 1, 1, 1)
@@ -53,7 +55,7 @@
 				// x方向振动，所以应该是 sin(z) 只保留z方向即可(标准正弦)(私自改动 2018年8月8日 聂红强)。
 				// 乘以_Magnitude 控制幅度
 				offset.x = sin(_Frequency * _Time.y + v.vertex.z * _InvWaveLength) * _Magnitude;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex + offset);
+				o.pos = UnityObjectToClipPos(v.vertex + offset);
 				
 				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 				o.uv +=  float2(0.0, _Time.y * _Speed);

@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Unity Shaders Book/Chapter 11/Water" {
 	Properties {
 		_MainTex ("Main Tex", 2D) = "white" {}							//河流纹理
@@ -66,7 +68,7 @@ Shader "Unity Shaders Book/Chapter 11/Water" {
 				offset.x = sin(_Frequency * _Time.y + (v.vertex.z) * _InvWaveLength) * _Magnitude;
 
 				//顶点加上偏移，变换到裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex + offset);
+				o.pos = UnityObjectToClipPos(v.vertex + offset);
 				
 				//计算纹理uv
 				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);

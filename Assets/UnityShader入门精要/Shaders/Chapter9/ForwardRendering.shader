@@ -1,4 +1,6 @@
-﻿Shader "Unity Shaders Book/Chapter 9/ForwardRendering"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Unity Shaders Book/Chapter 9/ForwardRendering"
 {
 	Properties {
 		_Diffuse ("Diffuse", Color) = (1, 1, 1, 1)
@@ -39,7 +41,7 @@
 			
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				
 				o.worldNormal = UnityObjectToWorldNormal(v.normal);
 				
@@ -108,7 +110,7 @@
 			
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				
 				o.worldNormal = UnityObjectToWorldNormal(v.normal);
 				

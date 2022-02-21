@@ -1,4 +1,6 @@
-﻿Shader "Unity Shaders Book/Chapter 12/Brightness Saturation And Contrast" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Unity Shaders Book/Chapter 12/Brightness Saturation And Contrast" {
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}		//Graphics.Blit(src, dest, material); 将把第一个参数传递给Shader的 _MainTex 属性
 		
@@ -41,7 +43,7 @@
 				v2f o;
 				
 				//顶点从模型空间变换到裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				//计算uv
 				o.uv = v.texcoord;
 						 

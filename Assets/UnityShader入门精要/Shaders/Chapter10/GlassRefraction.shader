@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 Shader "Unity Shaders Book/Chapter 10/Glass Refraction" {
 	Properties {
@@ -62,7 +64,7 @@ Shader "Unity Shaders Book/Chapter 10/Glass Refraction" {
 			
 			v2f vert (a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				
 				o.scrPos = ComputeGrabScreenPos(o.pos);			//用内置的 ComputeGrabScreenPos (声明在 UnityCG.cginc 中)函数计算得到对应被抓取的屏幕图像的采样坐标
 				

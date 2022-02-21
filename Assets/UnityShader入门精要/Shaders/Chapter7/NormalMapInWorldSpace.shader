@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 //凹凸映射_世界空间下的法线纹理
 Shader "Unity Shaders Book/Chapter 7/NormalMapInWorldSpace"
@@ -55,7 +57,7 @@ Shader "Unity Shaders Book/Chapter 7/NormalMapInWorldSpace"
 
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				//xy存放_MainTex的纹理坐标
 				o.uv.xy = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw;

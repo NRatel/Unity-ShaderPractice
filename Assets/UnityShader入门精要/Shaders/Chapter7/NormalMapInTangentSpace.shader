@@ -1,4 +1,6 @@
-﻿//凹凸映射_切线空间下的法线纹理
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//凹凸映射_切线空间下的法线纹理
 Shader "Unity Shaders Book/Chapter 7/NormalMapInTangentSpace"
 {
 	Properties
@@ -49,7 +51,7 @@ Shader "Unity Shaders Book/Chapter 7/NormalMapInTangentSpace"
 
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				//xy存放_MainTex的纹理坐标
 				o.uv.xy = v.texcoord.xy * _MainTex_ST.xy + _MainTex_ST.zw;

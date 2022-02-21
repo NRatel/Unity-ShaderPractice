@@ -1,4 +1,6 @@
-﻿//渐变纹理
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//渐变纹理
 Shader "Unity Shaders Book/Chapter 7/RampTexture"
 {
 	Properties
@@ -45,7 +47,7 @@ Shader "Unity Shaders Book/Chapter 7/RampTexture"
 
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));
 				o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 				o.uv = TRANSFORM_TEX(v.texcoord, _RampTex);					//Unity内置方法计算uv

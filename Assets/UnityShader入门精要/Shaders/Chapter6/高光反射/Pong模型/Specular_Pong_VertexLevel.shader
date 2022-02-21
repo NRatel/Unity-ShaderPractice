@@ -1,4 +1,6 @@
-﻿//BlinnPong模型 逐顶点高光反射
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//BlinnPong模型 逐顶点高光反射
 Shader "Unity Shaders Book/Chapter 6/Specular_Pong_VertexLevel"
 {
 	Properties
@@ -38,7 +40,7 @@ Shader "Unity Shaders Book/Chapter 6/Specular_Pong_VertexLevel"
 			v2f vert(a2v v) {
 				v2f o;
 				//将顶点坐标从 模型空间 变换到 裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				//环境光 (公式中的 C_ambient)
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.rgb;

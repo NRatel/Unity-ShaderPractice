@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_LightMatrix0' with 'unity_WorldToLight'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_LightMatrix0' with 'unity_WorldToLight'
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 //Shader代码主要用来接受阴影， 投射阴影功能在 FallBack Specular =》 VerLit Sahder中
@@ -47,7 +49,7 @@ Shader "Unity Shaders Book/Chapter 9/Shadow" {
 			
 			v2f vert(a2v v) {
 			 	v2f o;
-			 	o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			 	o.pos = UnityObjectToClipPos(v.vertex);
 			 	
 			 	o.worldNormal = UnityObjectToWorldNormal(v.normal);
 
@@ -123,7 +125,7 @@ Shader "Unity Shaders Book/Chapter 9/Shadow" {
 			
 			v2f vert(a2v v) {
 			 	v2f o;
-			 	o.position = mul(UNITY_MATRIX_MVP, v.vertex);
+			 	o.position = UnityObjectToClipPos(v.vertex);
 			 	
 			 	o.worldNormal = UnityObjectToWorldNormal(v.normal);
 			 	

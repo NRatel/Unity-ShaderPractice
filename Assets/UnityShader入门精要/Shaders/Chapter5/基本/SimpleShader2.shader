@@ -1,4 +1,6 @@
-﻿//认识结构体 a2f - application 向 vertex着色器传递
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//认识结构体 a2f - application 向 vertex着色器传递
 Shader "Unity Shaders Book/Chapter 5/SimpleShader2"
 {
 	Properties
@@ -28,7 +30,7 @@ Shader "Unity Shaders Book/Chapter 5/SimpleShader2"
 
 			//使用结构体作为输入参数
 			float4 vert(a2v v) : SV_POSITION {
-				return mul (UNITY_MATRIX_MVP, v.vertex);
+				return UnityObjectToClipPos (v.vertex);
 			}
 
 			fixed4 frag() : SV_Target {

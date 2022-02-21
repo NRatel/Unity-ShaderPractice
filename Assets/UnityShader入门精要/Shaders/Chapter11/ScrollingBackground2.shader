@@ -1,4 +1,6 @@
-﻿Shader "Unity Shaders Book/Chapter 11/Scrolling Background2" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Unity Shaders Book/Chapter 11/Scrolling Background2" {
 	Properties {
 		_MainTex ("Base Layer (RGB)", 2D) = "white" {}			//第一层纹理(下层)
 		_DetailTex ("2nd Layer (RGB)", 2D) = "white" {}			//第二层纹理(上层)
@@ -42,7 +44,7 @@
 			v2f vert (a2v v) {
 				v2f o;
 				//基本操作。模型空间顶点变换到裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);	
+				o.pos = UnityObjectToClipPos(v.vertex);	
 				
 				//首先使用Unity内置的TRANSFORM_TEX方法计算uv，然后利用_Time.y 在水平方向(x方向)上对纹理坐标进行偏移
 				o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex) + frac(float2(_ScrollX, 0.0) * _Time.y);

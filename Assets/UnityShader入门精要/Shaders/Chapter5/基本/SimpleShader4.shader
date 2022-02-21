@@ -1,4 +1,6 @@
-﻿//自定义属性参数，控制Shader表现
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//自定义属性参数，控制Shader表现
 Shader "Unity Shaders Book/Chapter 5/SimpleShader4"
 {
 	Properties
@@ -39,7 +41,7 @@ Shader "Unity Shaders Book/Chapter 5/SimpleShader4"
 
 			v2f vert(a2v v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 				o.color = v.normal * 0.5 + fixed3(0.5, 0.5, 0.5); 
 				return o;
 			}

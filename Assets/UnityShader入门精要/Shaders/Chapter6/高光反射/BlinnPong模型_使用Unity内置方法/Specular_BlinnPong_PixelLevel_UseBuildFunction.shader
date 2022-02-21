@@ -1,4 +1,6 @@
-﻿//BlinnPong模型 逐像素高光反射 使用Unity内置方法
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//BlinnPong模型 逐像素高光反射 使用Unity内置方法
 //这些内置方法 参考 《Unity Shader入门精要》第137页的表格
 Shader "Unity Shaders Book/Chapter 6/Specular_BlinnPong_PixelLevel_UseBuildFunction"
 {
@@ -40,7 +42,7 @@ Shader "Unity Shaders Book/Chapter 6/Specular_BlinnPong_PixelLevel_UseBuildFunct
 			v2f vert(a2v v) {
 				v2f o;
 				//将顶点坐标从 模型空间 变换到 裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				//使用Unity内置方法 UnityObjectToWorldNormal 计算法线
 				o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));

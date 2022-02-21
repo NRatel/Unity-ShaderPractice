@@ -1,4 +1,6 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 //Shader代码主要用来接受阴影， 投射阴影功能在 FallBack Specular =》 VerLit Sahder中
 Shader "Unity Shaders Book/Chapter 9/AttenuationAndShadowUseBuild-inFunctions" {
@@ -47,7 +49,7 @@ Shader "Unity Shaders Book/Chapter 9/AttenuationAndShadowUseBuild-inFunctions" {
 			
 			v2f vert(a2v v) {
 			 	v2f o;
-			 	o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			 	o.pos = UnityObjectToClipPos(v.vertex);
 			 	o.worldNormal = UnityObjectToWorldNormal(v.normal);
 			 	o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 				//内置宏， 用于在顶点着色器中计算上一步声明的阴影纹理坐标。
@@ -120,7 +122,7 @@ Shader "Unity Shaders Book/Chapter 9/AttenuationAndShadowUseBuild-inFunctions" {
 			
 			v2f vert(a2v v) {
 			 	v2f o;
-			 	o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+			 	o.pos = UnityObjectToClipPos(v.vertex);
 			 	o.worldNormal = UnityObjectToWorldNormal(v.normal);
 			 	o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 			 	TRANSFER_SHADOW(o);

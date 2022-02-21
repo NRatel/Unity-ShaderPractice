@@ -1,4 +1,6 @@
-﻿//兰伯特光照模型 逐像素漫反射 (更加平滑的光照效果)
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//兰伯特光照模型 逐像素漫反射 (更加平滑的光照效果)
 Shader "Unity Shaders Book/Chapter 6/Diffuse_Lambert_PixelLevel"
 {
 	Properties
@@ -37,7 +39,7 @@ Shader "Unity Shaders Book/Chapter 6/Diffuse_Lambert_PixelLevel"
 				v2f o;
 
 				//将顶点坐标从 模型空间 变换到 裁剪空间
-				o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos (v.vertex);
 				//世界空间的法线方向(归一化向量) (公式中的n) 。 (从 模型空间 变换到 世界空间。)
 				o.worldNormal = normalize(mul(unity_ObjectToWorld, v.normal));
 				//o.worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));	//或由世界空间到模型空间的逆矩阵变换

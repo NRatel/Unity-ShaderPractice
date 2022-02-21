@@ -1,4 +1,6 @@
-﻿Shader "Unity Shaders Book/Chapter 11/Image Sequence Animation" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Unity Shaders Book/Chapter 11/Image Sequence Animation" {
 	Properties {
 		_Color ("Color Tint", Color) = (1, 1, 1, 1)				//
 		_MainTex ("Image Sequence", 2D) = "white" {}			//包含了所有关键帧的纹理
@@ -45,7 +47,7 @@
 			v2f vert (a2v v) {  
 				v2f o;  
 				//顶点变换-模型空间到裁剪空间
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);  
+				o.pos = UnityObjectToClipPos(v.vertex);  
 				//使用Unity内置的TRANSFORM_TEX方法计算uv
 				o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);  
 				return o;

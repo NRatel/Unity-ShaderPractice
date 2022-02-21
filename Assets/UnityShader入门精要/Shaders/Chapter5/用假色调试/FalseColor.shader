@@ -1,4 +1,6 @@
-﻿//调试Shader,观察法线、切线、副切线、第一二组纹理坐标等。
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+//调试Shader,观察法线、切线、副切线、第一二组纹理坐标等。
 Shader "Unity Shaders Book/Chapter 5/FalseColor"
 {
 	Properties
@@ -22,7 +24,7 @@ Shader "Unity Shaders Book/Chapter 5/FalseColor"
 
 			v2f vert(appdata_full v) {
 				v2f o;
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				///
 				//可对下边的o.color 选择性注释和保留，进行观察。//
